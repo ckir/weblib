@@ -1,3 +1,3 @@
-import { ApiNasdaq } from './Nasdaq/ApiNasdaq.mjs';
 
-export { ApiNasdaq };
+import * as Nasdaq from './Nasdaq/index.mjs';
+export { Nasdaq };

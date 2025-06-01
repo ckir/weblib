@@ -1,4 +1,4 @@
-export class ApiNasdaq {
+export class Retrieve {
 
     static apiFetch = async (url) => {
         let apiHeaders;
@@ -54,8 +54,8 @@ export class ApiNasdaq {
         return messages.join('::');
     } // apiErrorToString
 
-    static async apiNasdaqFetch(url) {
-        const response = await ApiNasdaq.apiFetch(url);
+    static async endpoint(url) {
+        const response = await Retrieve.apiFetch(url);
 
         // Convert headers to an object
         const headers = Object.fromEntries(response.headers.entries());
@@ -94,4 +94,4 @@ export class ApiNasdaq {
         };
     } // apiNasdaqFetch
 
-}
+} // Retrieve
