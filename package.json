@@ -5,6 +5,7 @@
   "main": "src/index.mjs",
   "private": true,
   "type": "module",
+  "types": "./index.d.ts",
   "exports": {
     ".": {
       "import": "./src/index.mjs"
