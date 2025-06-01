@@ -80,7 +80,7 @@ async function apiNasdaqFetch(url) {
     const newYorkTimeZone = "America/New_York";
     const nowInNewYork = new Date().toLocaleString("en-US", { timeZone: newYorkTimeZone });
     const newYorkDate = new Date(nowInNewYork);
-    if (!url.includes('charting')) {
+    if (url.includes('charting')) {
         body.ts = newYorkDate.toISOString();
     } else {
         body.data.ts = newYorkDate.toISOString();
