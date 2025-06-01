@@ -1,3 +1,3 @@
-import ApiNasdaq from "./apiNasdaq.mjs";
+import ApiNasdaq from "./ApiNasdaq.mjs";
 
 export {ApiNasdaq};

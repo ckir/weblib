@@ -1,4 +1,4 @@
-export default class ApiNasdaq {
+export class ApiNasdaq {
 
     static apiFetch = async (url) => {
         let apiHeaders;
