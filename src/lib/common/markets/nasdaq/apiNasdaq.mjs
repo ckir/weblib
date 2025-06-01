@@ -55,7 +55,7 @@ export default class ApiNasdaq {
     } // apiErrorToString
 
     static async apiNasdaqFetch(url) {
-        const response = await NasdaqApi.apiFetch(url);
+        const response = await ApiNasdaq.apiFetch(url);
 
         // Convert headers to an object
         const headers = Object.fromEntries(response.headers.entries());
