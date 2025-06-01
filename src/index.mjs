@@ -1,18 +1,14 @@
+// src/index.js
+import * as Common from './lib/common/index.js';
+import * as Cloudflare from './lib/cloudflare/index.js';
+import * as CloudRun from './lib/cloudrun/index.js';
+import * as Lambda from './lib/lambda/index.js';
 
-import path from 'node:path';
+const WebLib = {
+    Common,
+    Cloudflare,
+    CloudRun,
+    Lambda,
+};
 
-async function loadModule(moduleFile) {
-    const module = await import(moduleFile);
-    return module.default || module;
-}
-
-export default {
-    markets: {
-        nasdaq: {
-            apiNasdaq: async () => {
-                const module = await loadModule(pathjoin('.', 'lib', 'common', 'markets', 'nasdaq', 'apiNasdaq.mjs'));
-                return module;
-            },
-        }
-    },
-}
+export default WebLib;
