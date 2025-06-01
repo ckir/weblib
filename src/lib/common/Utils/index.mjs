@@ -1,5 +1,3 @@
+import { DateTimeUtils } from './Utils.mjs';
 
-export function utilityFunction() {
-    // Some utility logic
-    return "Utility Function Result";
-}
+export { DateTimeUtils }

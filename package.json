@@ -25,5 +25,9 @@
   "bugs": {
     "url": "https://github.com/ckir/weblib/issues"
   },
-  "homepage": "https://github.com/ckir/weblib#readme"
+  "homepage": "https://github.com/ckir/weblib#readme",
+  "dependencies": {
+    "croner": "^9.0.0",
+    "luxon": "^3.6.1"
+  }
 }
