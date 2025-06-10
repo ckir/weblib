@@ -160,7 +160,9 @@ export class Retrieve {
         let responseText;
 
         try {
+            console.log(`[DEBUG] Before response.text() for ${url}. response.bodyUsed: ${response.bodyUsed}, response.body: ${!!response.body}`);
             responseText = await response.text();
+            console.log(`[DEBUG] After response.text() for ${url}. response.bodyUsed: ${response.bodyUsed}`);
         } catch (textError) {
             console.error(`[ERROR] Failed to read response text for ${url} (Status: ${response.status}): ${textError.message}`);
             return {
