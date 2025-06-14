@@ -3,13 +3,15 @@ name: Bump Minor Version on Push
 on:
   push:
     branches:
-      - main  # Change this if your default branch has a different name
+      - main  # Change this if your default branch is not 'main'
 
 jobs:
   bump-version:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -17,10 +19,22 @@ jobs:
           node-version: '20'
 
       - name: Bump minor version in package.json
-        run: npm version minor --no-git-tag-version
+        run: |
+          npm version minor --no-git-tag-version
 
-      - name: Commit and Push changes
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: 'chore: bump minor version [skip ci]'
-          add: 'package.json package-lock.json'
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git add package.json package-lock.json || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: bump minor version [skip ci]"
+            git push origin HEAD:${GITHUB_REF##*/}
+          else
+            echo "No changes to commit."
+          fi
