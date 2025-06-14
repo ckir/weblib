@@ -1,4 +1,5 @@
-import { DateTimeUtils } from './Misc/Utils.mjs';
+import ArrayUtils from './Misc/ArrayUtils.mjs'
+import DateTimeUtils from './Misc/DateTimeUtils.mjs';
 import AlertTelegram from './Alerts/AlertTelegram.mjs'
 
 const Alerts = {
@@ -6,6 +7,7 @@ const Alerts = {
 }
 
 const Misc = {
+    ArrayUtils: ArrayUtils,
     DateTimeUtils: DateTimeUtils,
 }
 
