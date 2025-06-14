@@ -1,3 +1,12 @@
-import { DateTimeUtils } from './Utils.mjs';
+import { DateTimeUtils } from './Misc/Utils.mjs';
+import AlertTelegram from './Alerts/AlertTelegram.mjs'
 
-export { DateTimeUtils }
+const Alerts = {
+    AlertTelegram: AlertTelegram
+}
+
+const Misc = {
+    DateTimeUtils: DateTimeUtils,
+}
+
+export { Alerts, Misc }
