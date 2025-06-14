@@ -22,7 +22,7 @@ jobs:
           node-version: '20'
 
       - name: Bump minor version in package.json
-        run: npm version minor --no-git-tag-version
+        run: npm version patch --no-git-tag-version
 
       - name: Configure git
         run: |
