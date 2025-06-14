@@ -2,12 +2,13 @@ import { Bot } from 'grammy';
 
 // Find user IDs with https://t.me/getidsbot
 export default class AlertTelegram {
-    constructor(bot = process.env.WEBLIB_ALERTTELEGRAM_BOT, recipients = [1538031015]) {
+
+    constructor(bot = process.env.WEBLIB_ALERTTELEGRAM_BOT, recipients = process.env.WEBLIB_ALERTTELEGRAM_RECIPIENTS.split(",").map(i => i.trim())) {
         this.className = this.constructor.name;
         this.bot = new Bot(bot);
         this.logger = global.logger;
         this.recipients = recipients;
-    }
+    } // constructor
 
     async sendTelegram(message) {
 
@@ -29,7 +30,7 @@ export default class AlertTelegram {
     } // sendTelegram
 
     splitStringByLine(string, maxLength) {
-        const lines = string.split('\n');
+        const lines = string.split(/\r\n|\r|\n/);
         const parts = [];
         let currentPart = '';
 
