@@ -1,4 +1,4 @@
-name: Bump Minor Version on Push
+name: Bump Patch Version on Push
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Bump minor version in package.json
+      - name: Bump Patch version in package.json
         run: npm version patch --no-git-tag-version
 
       - name: Configure git
@@ -33,7 +33,7 @@ jobs:
         run: |
           git add package.json package-lock.json || true
           if ! git diff --cached --quiet; then
-            git commit -m "chore: bump minor version [skip ci]"
+            git commit -m "chore: bump patch version [skip ci]"
           else
             echo "No changes to commit."
           fi
