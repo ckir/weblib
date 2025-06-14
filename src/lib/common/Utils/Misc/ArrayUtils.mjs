@@ -1,7 +1,7 @@
 export default class ArrayUtils {
 
     /**
-    * Function to enclose array values
+    * Method to enclose array values
     * 
     * @param {array} array
     * @param {string} prefix default '['
@@ -14,7 +14,7 @@ export default class ArrayUtils {
     }
 
     /**
-     * Function to find the differences between two arrays
+     * Method to find the differences between two arrays
      *
      * @param {array} oldArray
      * @param {array} newArray
@@ -34,5 +34,20 @@ export default class ArrayUtils {
         return changes
 
     } // arrayDiff
+
+    /**
+    * Method to split an array to chunks of a given size
+    * 
+    * @param {array} array
+    * @param {number} size
+    * @returns {array}
+    * 
+    */
+    static arrayChunk(array, size) {
+        return Array.from({ length: Math.ceil(array.length / size) }, (_, index) =>
+            array.slice(index * size, index * size + size)
+        );
+    } // arrayChunk
+
 
 } // ArrayUtils
