@@ -6,7 +6,10 @@ import * as Lambda from './lib/lambda/index.mjs';
 import Logger from './lib/common/Logger/Logger.mjs';
 
 global.WebLib = {};
-global.WebLib.logger = new Logger();
+if (!global.logger) {
+    const { default: Logger } = await import('./lib/common/Logger/Logger.mjs');
+    global.logger = new Logger();
+}
 
 const WebLib = {
     Common,

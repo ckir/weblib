@@ -5,7 +5,7 @@ export default class AlertTelegram {
     constructor(bot = process.env.WEBLIB_ALERTTELEGRAM_BOT, recipients = [1538031015]) {
         this.className = this.constructor.name;
         this.bot = new Bot(bot);
-        this.logger = global.WebLib.logger;
+        this.logger = global.logger;
         this.recipients = recipients;
     }
 
@@ -18,10 +18,10 @@ export default class AlertTelegram {
             for (const part of parts) {
                 try {
                     await this.bot.api.sendMessage(recipient, part);
-                    this.logger.silly(`Message sent: ${message}`);
+                    this.logger.silly(`${this.className}: Message sent: ${message}`);
                 } catch (error) {
-                    console.error(error);
-                    this.logger.error(`Error sending message to ${recipient}: ${part}`, error);
+                    this.logger.error(error);
+                    this.logger.error(`${this.className}: Error sending message to ${recipient}: ${part}`, error);
                 }
             }
         }
