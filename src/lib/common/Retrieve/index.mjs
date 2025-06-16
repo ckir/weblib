@@ -1,3 +1,4 @@
+import RequestSerializer from "./RequestSerializer.mjs";
 import SerializeResponse from "./SerializeResponse.mjs";
 
-export { SerializeResponse }
+export { RequestSerializer, SerializeResponse }
