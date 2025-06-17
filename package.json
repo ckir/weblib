@@ -1,5 +1,5 @@
 {
-  "name": "ckir_weblib",
+  "name": "@ckir/weblib",
   "version": "1.0.3",
   "description": "",
   "main": "src/index.mjs",
