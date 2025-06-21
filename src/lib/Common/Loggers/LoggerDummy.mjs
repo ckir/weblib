@@ -2,7 +2,7 @@ import packageJson from '../../../../package.json' with { type: 'json' };
 
 const packageName = packageJson.name;
 
-export default class Logger {
+export default class LoggerDummy {
 
     defaults = {}
 
@@ -18,4 +18,4 @@ export default class Logger {
     error(...args) { console.log(new Date().toISOString(), `ERROR: ${packageName}: `, ...args); }
     fatal(...args) { console.log(new Date().toISOString(), `FATAL: ${packageName}: `, ...args); }
 
-} // Logger
+} // LoggerDummy
