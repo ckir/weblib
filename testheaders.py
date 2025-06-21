@@ -26,8 +26,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(b"Headers and body received. Check the server console.")
 
 if __name__ == "__main__":
-    server_address = ("", 8080)  # Listen on port 8080
+    server_address = ("", 8000)  # Listen on port 8080
     httpd = HTTPServer(server_address, RequestHandler)
-    print("Server running on port 8080...")
+    print("Server running on port 8000...")
     httpd.serve_forever()
     
