@@ -38,7 +38,7 @@ function getHeaders(url) {
     }
 } // getHeaders
 
-export class ApiUnlimited {
+export default class ApiUnlimited {
 
     static async endPoint(url, retry = null) {
 

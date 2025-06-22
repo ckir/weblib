@@ -1,2 +1,2 @@
-import { ApiUnlimited } from "./ApiUnlimited.mjs";
+import ApiUnlimited from "./ApiUnlimited.mjs";
 export { ApiUnlimited };

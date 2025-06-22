@@ -1,4 +1,3 @@
-// Type definitions for 'c:\Users\User\Development\Node\weblib\src\lib\common\index.mjs'
 
 /**
  * This file should declare all the exports from the corresponding .mjs file.
