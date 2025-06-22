@@ -1,7 +1,7 @@
 import ky from 'ky';
 import { serializeError } from 'serialize-error';
 import Response from './Response.mjs';
-import LoggerDummy from '../../Logger/LoggerDummy.mjs';
+import LoggerDummy from '../Loggers/LoggerDummy.mjs';
 
 if (typeof global.logger === 'undefined') {
     global.logger = new LoggerDummy();
