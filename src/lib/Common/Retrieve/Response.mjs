@@ -1,6 +1,6 @@
-export default class SerializeResponse {
+export default class Response {
 
-    static async serializeResponse(response) {
+    static async serialize(response) {
         if (!response) {
             return null;
         }

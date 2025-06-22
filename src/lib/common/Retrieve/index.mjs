@@ -1,4 +1,4 @@
-import RequestSerializer from "./RequestSerializer.mjs";
-import SerializeResponse from "./SerializeResponse.mjs";
+import RequestUnlimited from "./RequestUnlimited.mjs";
+import RequestLimited from "./RequestLimited.mjs";
 
-export { RequestSerializer, SerializeResponse }
+export { RequestLimited, RequestUnlimited }

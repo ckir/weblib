@@ -1,9 +1,14 @@
-// ky-queue-combiner.js
 import ky from 'ky';
 import PQueue from 'p-queue';
 import { URL } from 'url'; // Node.js built-in module
 import EventEmitter from 'events'; // Node.js built-in module
 import { serializeError } from 'serialize-error'; // Import serialize-error
+import LoggerDummy from '../Loggers/LoggerDummy.mjs'; // Import a dummy logger for error handling
+
+if (typeof global.logger === 'undefined') {
+    // If no global logger is set, use a dummy logger to avoid errors
+    global.logger = new LoggerDummy();
+}
 
 /**
  * @typedef {Object} RequestObject
@@ -25,7 +30,7 @@ import { serializeError } from 'serialize-error'; // Import serialize-error
  */
 
 // Module-level map to store PQueue instances, keyed by hostname.
-// This makes the queues shared across all instances of KyQueueCombiner.
+// This makes the queues shared across all instances of RequestLimited.
 let queues = new Map();
 
 // Internal reference to the ky instance, defaults to the imported one.
@@ -33,13 +38,13 @@ let queues = new Map();
 let currentKyInstance = ky;
 
 /**
- * `KyQueueCombiner` combines the capabilities of the `ky` HTTP client with `p-queue`
+ * `RequestLimited` combines the capabilities of the `ky` HTTP client with `p-queue`
  * for concurrency control, managing separate queues for each hostname.
  * It extends `EventEmitter` to re-transmit events from underlying queues and requests.
  */
-class KyQueueCombiner extends EventEmitter {
+class RequestLimited extends EventEmitter {
     /**
-     * Creates an instance of KyQueueCombiner.
+     * Creates an instance of RequestLimited.
      * @param {ConstructorOptions} [options={}] - Options to configure default settings and hostname-specific overrides.
      */
     constructor(options = {}) {
@@ -112,7 +117,7 @@ class KyQueueCombiner extends EventEmitter {
     }
 
     /**
-     * Sets up event forwarding from a PQueue instance to the KyQueueCombiner instance.
+     * Sets up event forwarding from a PQueue instance to the RequestLimited instance.
      * All standard P-Queue events are re-transmitted, prefixed with the hostname.
      * @private
      * @param {PQueue} queue - The PQueue instance to listen to.
@@ -154,7 +159,7 @@ class KyQueueCombiner extends EventEmitter {
             // Basic validation for the request object
             if (!request || typeof request.url !== 'string') {
                 const errorMessage = 'Invalid request: Each request must be an object with a "url" string property.';
-                console.error(errorMessage, request);
+                global.logger.error(errorMessage, request);
                 const error = new Error(errorMessage);
                 // Attach the URL to the error before serialization
                 error.url = request ? request.url : 'N/A'; // Add URL for better context
@@ -169,7 +174,7 @@ class KyQueueCombiner extends EventEmitter {
                 parsedUrl = new URL(request.url);
             } catch (error) {
                 const errorMessage = `Invalid URL provided: "${request.url}".`;
-                console.error(errorMessage, error);
+                global.logger.error(errorMessage, error);
                 // Attach the URL to the error before serialization
                 error.url = request.url; // Add URL for better context
                 this.emit('request:error', { url: request.url, error: serializeError(error), message: errorMessage });
@@ -213,7 +218,7 @@ class KyQueueCombiner extends EventEmitter {
                     error.url = request.url; // Add URL for better context
                     // Emit an event if the request encounters an error, serializing it
                     this.emit('request:error', { url: request.url, hostname, error: serializeError(error) });
-                    console.error(`Error fetching ${request.url} (Hostname: ${hostname}):`, error.message);
+                    global.logger.error(`Error fetching ${request.url} (Hostname: ${hostname}):`, error.message);
                     throw error; // Re-throw the error so Promise.allSettled catches it as a rejection
                 }
             });
@@ -281,4 +286,4 @@ class KyQueueCombiner extends EventEmitter {
     }
 }
 
-export default KyQueueCombiner;
+export default RequestLimited;

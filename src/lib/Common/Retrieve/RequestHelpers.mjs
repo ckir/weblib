@@ -1,3 +1,9 @@
+import LoggerDummy from '../../Logger/LoggerDummy.mjs';
+
+if (typeof global.logger === 'undefined') {
+    global.logger = new LoggerDummy();
+}
+
 export default class RequestSerializer {
     /**
      * Serializes a Request object into a plain JavaScript object.
@@ -37,7 +43,7 @@ export default class RequestSerializer {
             // If body has already been used, we cannot read it again.
             // In a real application, you might want to clone the request before using its body
             // or handle this scenario based on your application's logic.
-            console.warn('Request body has already been used. Body will not be serialized.');
+            global.logger.warn('Request body has already been used. Body will not be serialized.');
         } else if (request.method !== 'GET' && request.method !== 'HEAD') {
             try {
                 // Attempt to read body as text. Adjust based on expected content type (e.g., blob, arrayBuffer, formData)
@@ -46,7 +52,7 @@ export default class RequestSerializer {
                 // You might also want to store content-type to help deserialize
                 serializedRequest.bodyType = 'text'; // Or 'json', 'blob', 'arrayBuffer', 'formData'
             } catch (error) {
-                console.error('Error reading request body:', error);
+                global.logger.error('Error reading request body:', error);
                 serializedRequest.body = null;
             }
         }
@@ -110,54 +116,55 @@ export default class RequestSerializer {
 
         return new Request(url, requestOptions);
     }
-}
+
+} // RequestSerializer
 
 // --- Example Usage ---
 
-async function main() {
-    // 1. Create a Request object
-    const originalRequest = new Request('https://api.example.com/data', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Custom-Header': 'Hello'
-        },
-        body: JSON.stringify({ name: 'Alice', age: 30 }),
-        cache: 'no-cache',
-        mode: 'cors'
-    });
+// async function main() {
+//     // 1. Create a Request object
+//     const originalRequest = new Request('https://api.example.com/data', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'X-Custom-Header': 'Hello'
+//         },
+//         body: JSON.stringify({ name: 'Alice', age: 30 }),
+//         cache: 'no-cache',
+//         mode: 'cors'
+//     });
 
-    console.log('Original Request URL:', originalRequest.url);
-    console.log('Original Request Method:', originalRequest.method);
-    console.log('Original Request Headers:', Object.fromEntries(originalRequest.headers.entries()));
+//     console.log('Original Request URL:', originalRequest.url);
+//     console.log('Original Request Method:', originalRequest.method);
+//     console.log('Original Request Headers:', Object.fromEntries(originalRequest.headers.entries()));
 
-    // 2. Serialize the Request
-    const serializedData = await RequestSerializer.serialize(originalRequest);
-    console.log('\nSerialized Data:', JSON.stringify(serializedData, null, 2));
+//     // 2. Serialize the Request
+//     const serializedData = await RequestSerializer.serialize(originalRequest);
+//     console.log('\nSerialized Data:', JSON.stringify(serializedData, null, 2));
 
-    // You can now send `JSON.stringify(serializedData)` over a network,
-    // save it to a file, etc.
+//     // You can now send `JSON.stringify(serializedData)` over a network,
+//     // save it to a file, etc.
 
-    // 3. Deserialize the data back into a Request object
-    const reconstructedRequest = RequestSerializer.deserialize(serializedData);
+//     // 3. Deserialize the data back into a Request object
+//     const reconstructedRequest = RequestSerializer.deserialize(serializedData);
 
-    console.log('\nReconstructed Request URL:', reconstructedRequest.url);
-    console.log('Reconstructed Request Method:', reconstructedRequest.method);
-    console.log('Reconstructed Request Headers:', Object.fromEntries(reconstructedRequest.headers.entries()));
+//     console.log('\nReconstructed Request URL:', reconstructedRequest.url);
+//     console.log('Reconstructed Request Method:', reconstructedRequest.method);
+//     console.log('Reconstructed Request Headers:', Object.fromEntries(reconstructedRequest.headers.entries()));
 
-    // Verify body (needs to be read as well)
-    if (reconstructedRequest.method !== 'GET' && reconstructedRequest.method !== 'HEAD') {
-        const reconstructedBody = await reconstructedRequest.text();
-        console.log('Reconstructed Request Body:', reconstructedBody);
-        console.log('Body Matches Original:', reconstructedBody === JSON.stringify({ name: 'Alice', age: 30 }));
-    }
+//     // Verify body (needs to be read as well)
+//     if (reconstructedRequest.method !== 'GET' && reconstructedRequest.method !== 'HEAD') {
+//         const reconstructedBody = await reconstructedRequest.text();
+//         console.log('Reconstructed Request Body:', reconstructedBody);
+//         console.log('Body Matches Original:', reconstructedBody === JSON.stringify({ name: 'Alice', age: 30 }));
+//     }
 
-    // Example with a GET request (no body)
-    const getRequest = new Request('https://jsonplaceholder.typicode.com/todos/1');
-    const serializedGet = await RequestSerializer.serialize(getRequest);
-    const reconstructedGet = RequestSerializer.deserialize(serializedGet);
-    console.log('\nReconstructed GET Request URL:', reconstructedGet.url);
-    console.log('Reconstructed GET Request Body (should be null):', await reconstructedGet.text()); // Should be empty string if no body
-}
+//     // Example with a GET request (no body)
+//     const getRequest = new Request('https://jsonplaceholder.typicode.com/todos/1');
+//     const serializedGet = await RequestSerializer.serialize(getRequest);
+//     const reconstructedGet = RequestSerializer.deserialize(serializedGet);
+//     console.log('\nReconstructed GET Request URL:', reconstructedGet.url);
+//     console.log('Reconstructed GET Request Body (should be null):', await reconstructedGet.text()); // Should be empty string if no body
+// }
 
 // main().catch(console.error);
