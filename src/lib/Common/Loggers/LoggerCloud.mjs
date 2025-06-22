@@ -3,9 +3,9 @@ import PQueue from 'p-queue';
 import { serializeError } from 'serialize-error';
 import safeStringify from 'safe-stringify';
 
-import { DateTimeUtils } from "../Common/Utils/DateTimeUtils.mjs";
+import { DateTimeUtils } from "../Utils/Misc/DateTimeUtils.mjs";
 
-const LogMap = new Map();
+const LogMap = [];
 
 export default class LoggerCloud {
 
@@ -76,7 +76,7 @@ export default class LoggerCloud {
                 message: log_message,
                 extras: (log_extras instanceof Error) ? serializeError(log_extras) : log_extras,
             };
-            LogMap.set(logKey, logEntry);
+            LogMap.push({ key: logKey, value: logEntry });
         }
 
     } // log

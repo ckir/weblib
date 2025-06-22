@@ -209,3 +209,5 @@ export default class DateTimeUtils {
     }
 
 } // DateTimeUtils
+
+export { DateTimeUtils };
