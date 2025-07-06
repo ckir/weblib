@@ -84,7 +84,7 @@ describe('RequestUnlimited', () => {
             // Assert
             expect(mockKyInstance).toHaveBeenCalledWith(mockUrl, { method: 'get' });
             expect(serializeError).toHaveBeenCalledWith(mockError);
-            expect(global.logger.warn).toHaveBeenCalledWith('Error occurred during API request:', mockError);
+            expect(global.logger.warn).toHaveBeenCalledWith('RequestUnlimited: Error occurred during API request:', mockError);
             expect(result).toEqual(mockSerializedError);
         });
     });
