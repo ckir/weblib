@@ -29,8 +29,9 @@ export default class Response {
                 // you might want to read as ArrayBuffer and convert to Base64,
                 // or simply indicate the content type and that it's not text/JSON.
                 // For this example, we'll just note it.
-                const bodyText = await clonedResponse.text().catch(() => "[Could not read body as text]");
-                body = `[Content-Type: ${contentType || 'N/A'} - Body preview: ${bodyText.substring(0, 100)}${bodyText.length > 100 ? '...' : ''}]`;
+                body = await clonedResponse.text().catch(() => "[Could not read body as text]");
+                // const bodyText = await clonedResponse.text().catch(() => "[Could not read body as text]");
+                // body = `[Content-Type: ${contentType || 'N/A'} - Body preview: ${bodyText.substring(0, 100)}${bodyText.length > 100 ? '...' : ''}]`;
                 // If you expect binary data and need to serialize it, consider:
                 // const buffer = await clonedResponse.arrayBuffer();
                 // body = Buffer.from(buffer).toString('base64'); // Example for Node.js Buffer
