@@ -31,7 +31,7 @@
   "dependencies": {
     "ansi-styles": "^6.2.1",
     "croner": "9.1.0",
-    "grammy": "1.36.3",
+    "grammy": "1.37.0",
     "ky": "1.8.1",
     "luxon": "3.6.1",
     "p-queue": "8.1.0",
@@ -39,8 +39,8 @@
     "serialize-error": "12.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "9.29.0",
-    "eslint": "9.29.0",
-    "globals": "16.2.0"
+    "@eslint/js": "9.30.1",
+    "eslint": "9.30.1",
+    "globals": "16.3.0"
   }
 }
