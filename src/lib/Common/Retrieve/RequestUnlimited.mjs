@@ -1,5 +1,11 @@
 import ky from 'ky';
 import { serializeError } from 'serialize-error';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const deepmerge = require('deepmerge');
+
+
+
 import Response from './Response.mjs';
 import LoggerDummy from '../Loggers/LoggerDummy.mjs';
 
@@ -21,8 +27,9 @@ export default class RequestUnlimited {
      */
     static defaults = {
         retry: {
+            timeout: 10000, // 10 seconds
             limit: 2,
-            methods: ['get'],
+            methods: ['get', 'post'],
             backoffLimit: 3000
         },
         hooks: {
@@ -36,7 +43,7 @@ export default class RequestUnlimited {
                     return error;
                 }
             ]
-        }
+        },
     }
 
     /**
@@ -54,28 +61,16 @@ export default class RequestUnlimited {
      * @returns {Promise<Object>} A promise that resolves to the serialized response object or a serialized error object.
      */
     static async endPoint(url, options = {}) {
-        // Separate ky.create options from the per-request options (method, body, json, etc.)
-        const { retry, headers, ...requestOptions } = options;
-
-        // Default to 'get' if no method is specified
-        if (!requestOptions.method) {
-            requestOptions.method = 'get';
-        }
-
-        const kyOptions = {
-                retry: retry || this.defaults.retry,
-                hooks: this.defaults.hooks
-            };
-        if (headers) kyOptions.headers = headers; // Add headers to the ky instance configuration
+        const kyOptions = deepmerge(this.defaults, options);
 
         try {
             const request = ky.create(kyOptions);
-            const responseObject = await request(url, requestOptions);
+            const responseObject = await request(url);
             const response = await Response.serialize(responseObject);
             return response;
         } catch (error) {
             const serializedError = serializeError(error);
-            global.logger.warn(`${this.name}: Error occurred during API request:`, error);
+            global.logger.warn('RequestUnlimited: Error occurred during API request:', serializedError);
             return serializedError;
         }
     } // endPoint
@@ -101,9 +96,12 @@ export default class RequestUnlimited {
 
             // This block is a safeguard. The `endPoint` method is designed to always resolve.
             // However, if it were to reject unexpectedly, we log it and return a serialized error.
-            global.logger.error(`${this.name}: Unexpected rejection in RequestUnlimited.endPoint:`, result.reason);
+            global.logger.error('RequestUnlimited: Unexpected rejection in RequestUnlimited.endPoint:', result.reason);
             return serializeError(result.reason);
         });
     } // endPoints
 
 } // RequestUnlimited
+
+// const resp = await RequestUnlimited.endPoint('https://jsonplaceholder.typicode.com/posts/1');
+// console.log(resp);

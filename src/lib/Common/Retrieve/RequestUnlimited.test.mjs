@@ -110,5 +110,28 @@ describe('RequestUnlimited', () => {
             expect(RequestUnlimited.endPoint).toHaveBeenCalledWith(urls[1], { method: 'post' });
             expect(results).toEqual([mockResponse1, mockResponse2]);
         });
+
+        it('should handle a mix of successful and failed requests', async () => {
+            // Arrange
+            const urls = ['https://api.example.com/success', 'https://api.example.com/fail'];
+            const mockSuccessResponse = { ok: true, statusCode: 200, body: 'data' };
+            const mockErrorResponse = { name: 'HTTPError', message: 'Server Error' };
+
+            // Spy on our own method to control its behavior for each call
+            jest.spyOn(RequestUnlimited, 'endPoint')
+                .mockResolvedValueOnce(mockSuccessResponse) // First call succeeds
+                .mockResolvedValueOnce(mockErrorResponse);  // Second call fails
+
+            // Act
+            const results = await RequestUnlimited.endPoints(urls);
+
+            // Assert
+            expect(RequestUnlimited.endPoint).toHaveBeenCalledTimes(2);
+            expect(RequestUnlimited.endPoint).toHaveBeenCalledWith(urls[0], {});
+            expect(RequestUnlimited.endPoint).toHaveBeenCalledWith(urls[1], {});
+            expect(results).toHaveLength(2);
+            expect(results[0]).toEqual(mockSuccessResponse);
+            expect(results[1]).toEqual(mockErrorResponse);
+        });
     });
 });

@@ -1,5 +1,6 @@
 import ArrayUtils from './Misc/ArrayUtils.mjs';
 import ConfigUtils from './Misc/ConfigUtils.mjs';
+import CryptoUtils from './Misc/CryptoUtils.mjs';
 import DateTimeUtils from './Misc/DateTimeUtils.mjs';
 import StringUtils from './Misc/StringUtils.mjs';
 import SystemInfoCollector from './Misc/SystemInfo.mjs';
@@ -9,6 +10,7 @@ import * as Alerts from './Alerts/index.mjs';
 const Misc = {
     ArrayUtils: ArrayUtils,
     ConfigUtils: ConfigUtils,
+    CryptoUtils: CryptoUtils,
     DateTimeUtils: DateTimeUtils,
     StringUtils: StringUtils,
     SystemInfo: SystemInfoCollector,
