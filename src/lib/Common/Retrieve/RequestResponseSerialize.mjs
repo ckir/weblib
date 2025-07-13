@@ -1,4 +1,4 @@
-export default class Response {
+export default class RequestResponseSerialize {
 
     static async serialize(response) {
         if (!response) {
@@ -59,4 +59,4 @@ export default class Response {
         };
     }
 
-} // SerializeResponse
+} // RequestResponseSerialize

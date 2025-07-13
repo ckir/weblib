@@ -1,14 +1,21 @@
-import ky from 'ky';
-import PQueue from 'p-queue';
 import { URL } from 'url'; // Node.js built-in module
 import EventEmitter from 'events'; // Node.js built-in module
-import { serializeError } from 'serialize-error'; // Import serialize-error
-import LoggerDummy from '../Loggers/LoggerDummy.mjs'; // Import a dummy logger for error handling
 
-if (typeof global.logger === 'undefined') {
-    // If no global logger is set, use a dummy logger to avoid errors
-    global.logger = new LoggerDummy();
+import ky from 'ky';
+import PQueue from 'p-queue';
+import { serializeError } from 'serialize-error'; // Import serialize-error
+
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const deepmerge = require('deepmerge');
+
+import RequestResponseSerialize from './RequestResponseSerialize.mjs';
+
+if (global.logger === undefined) {
+    const { default: Logger } = await import('../Loggers/LoggerDummy.mjs');
+    global.logger = new Logger();
 }
+
 
 /**
  * @typedef {Object} RequestObject
@@ -43,6 +50,29 @@ let currentKyInstance = ky;
  * It extends `EventEmitter` to re-transmit events from underlying queues and requests.
  */
 class RequestLimited extends EventEmitter {
+
+    defaults = {
+        ky: {
+            retry: {
+                timeout: 10000, // 10 seconds
+                limit: 2,
+                methods: ['get', 'post'],
+                backoffLimit: 3000
+            },
+            hooks: {
+                beforeError: [
+                    error => {
+                        const { response } = error;
+                        if (response && response.body) {
+                            error.status = response.status;
+                        }
+                        return error;
+                    }
+                ]
+            },
+        }
+    }
+
     /**
      * Creates an instance of RequestLimited.
      * @param {ConstructorOptions} [options={}] - Options to configure default settings and hostname-specific overrides.
@@ -51,7 +81,7 @@ class RequestLimited extends EventEmitter {
         super();
 
         // Default global Ky options
-        this.defaultKyOptions = options.kyDefaults || {};
+        this.defaultKyOptions = deepmerge(this.defaults.ky, options.kyDefaults || {});
 
         // Default global P-Queue options. Concurrency is key here.
         this.defaultQueueOptions = {
@@ -109,7 +139,7 @@ class RequestLimited extends EventEmitter {
 
             const queue = new PQueue(finalQueueOptions);
             queues.set(hostname, queue); // Use module-level 'queues' map
-            
+
             // Set up event forwarding from this newly created queue
             this._setupQueueEventForwarding(queue, hostname);
         }
@@ -190,12 +220,7 @@ class RequestLimited extends EventEmitter {
             // 2. `this.hostnameOverrides[hostname]?.kyOptions` (hostname-specific overrides)
             // 3. `globalKyOptions` (global options for this `fetchAll` call)
             // 4. `request.kyOptions` (options specific to this individual request)
-            const finalKyOptions = {
-                ...this.defaultKyOptions,
-                ...this.hostnameOverrides[hostname]?.kyOptions,
-                ...globalKyOptions,
-                ...request.kyOptions,
-            };
+            const finalKyOptions = deepmerge.all([ this.defaultKyOptions, this.hostnameOverrides[hostname]?.kyOptions || {}, globalKyOptions, request.kyOptions || {} ]);
 
             // Add the fetch task to the queue for the respective hostname.
             // The task itself is an async function that performs the Ky fetch.
@@ -208,7 +233,8 @@ class RequestLimited extends EventEmitter {
                     const response = await currentKyInstance(request.url, finalKyOptions);
 
                     // Assuming JSON response for simplicity. Adjust as needed if other formats are expected.
-                    const jsonResponse = await response.json();
+                    // const jsonResponse = await response.json();
+                    const jsonResponse = await RequestResponseSerialize.serialize(response);
 
                     // Emit an event indicating successful completion of the request
                     this.emit('request:success', { url: request.url, hostname, status: response.status });
@@ -229,7 +255,7 @@ class RequestLimited extends EventEmitter {
 
         let successfulCount = 0;
         let failedCount = 0;
-        const formattedResults = settledResults.map(result => {
+        let formattedResults = settledResults.map(async (result) => {
             if (result.status === 'fulfilled') {
                 successfulCount++;
                 return { status: 'fulfilled', value: result.value };
@@ -240,6 +266,8 @@ class RequestLimited extends EventEmitter {
                 return { status: 'rejected', reason: serializedReason };
             }
         });
+        formattedResults = await Promise.all(formattedResults);
+        formattedResults = formattedResults.map(r => r.value || r.reason);
 
         // Emit a general event indicating overall completion with counts
         this.emit('fetchAll:complete', { successful: successfulCount, failed: failedCount });

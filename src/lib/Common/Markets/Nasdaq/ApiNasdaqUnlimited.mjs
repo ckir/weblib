@@ -1,3 +1,8 @@
+if (global.logger === undefined) {
+    const { default: Logger } = await import('../Loggers/LoggerDummy.mjs');
+    global.logger = new Logger();
+}
+
 import RequestUnlimited from '../../Retrieve/RequestUnlimited.mjs';
 
 function getHeaders(url) {
@@ -38,16 +43,52 @@ function getHeaders(url) {
     }
 } // getHeaders
 
-export default class ApiUnlimited {
+export default class ApiNasdaqUnlimited {
+
+    static isResponseOk = (response) => {
+        if (response === null) {
+            return false;
+        }
+
+        if (response.status !== "success") {
+            return false;
+        }
+
+        if (!response.value.ok) {
+            return false;
+        }
+
+        if (response.value.body.status.rCode !== 200) {
+            return false;
+        }
+
+        return true;
+
+    } // isResponseOk
+
+    static apiErrorToString = (status) => {
+
+        let messages = [`rCode: ${status.rCode} `]
+        status.bCodeMessage.forEach(element => {
+            messages.push(` code: ${element.code} = ${element.errorMessage}`)
+        })
+        return messages.join('::')
+    } // apiErrorToString
 
     static async endPoint(url, retry = null) {
 
-        return RequestUnlimited.endPoint(url, getHeaders(url), retry);
+        const response = await RequestUnlimited.endPoint(url, { headers: getHeaders(url) }, retry);
+        if (!this.isResponseOk(response)) {
+            global.logger.error(`Request to ${url} failed with status: ${response.status}`);
+            return { status: 'error', reason: this.apiErrorToString(response.value.body.status) };
+        } else {
+            return { status: 'success', value: response.value.body.data };
+        }
 
     } // endPoint
 
-} // ApiUnlimited
+} // ApiNasdaqUnlimited
 
-// const res = await ApiUnlimited.endPoint('https://api.nasdaq.com/api/market-info');
+// const res = await ApiNasdaqUnlimited.endPoint('https://api.nasdaq.com/api/market-info');
 // console.log(res.status, res);
 // let a = 5;

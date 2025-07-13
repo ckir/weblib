@@ -117,12 +117,13 @@ export default class ConfigCloud {
         let encryptedText = null;
         let iv = null;
         try {
-            const response = await RequestUnlimited.endPoint(cloudConfigUrl);
-            if (response.status !== 200) {
+            let response = await RequestUnlimited.endPoint(cloudConfigUrl);
+            if (response.status !== 'success') {
                 global.logger.fatal(`Failed to fetch cloud config: ${response.status} ${response.statusText}`);
                 throw new Error(`Failed to fetch cloud config: ${response.status} ${response.statusText}`);
             }
-            const encrypteLines = response.body.split(/\r\n|\r|\n/);
+            response = response.value.body;
+            const encrypteLines = response.split(/\r\n|\r|\n/);
             iv = encrypteLines[0].trim();
             encryptedText = encrypteLines[1].trim();
         } catch (e) {

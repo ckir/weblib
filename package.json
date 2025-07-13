@@ -14,7 +14,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "test": "jest",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "build": "echo \"Error: no build specified\""
   },
   "repository": {
@@ -34,7 +34,7 @@
     "deepmerge": "^4.3.1",
     "grammy": "1.37.0",
     "ky": "1.8.1",
-    "luxon": "3.6.1",
+    "luxon": "3.7.1",
     "p-queue": "8.1.0",
     "safe-stringify": "1.2.0",
     "serialize-error": "12.0.0"
@@ -42,23 +42,11 @@
   "devDependencies": {
     "@babel/core": "^7.24.7",
     "@babel/preset-env": "^7.24.7",
-    "@eslint/js": "^9.30.1",
+    "@eslint/js": "9.31.0",
     "babel-jest": "30.0.4",
-    "eslint": "^9.30.1",
+    "eslint": "9.31.0",
     "eslint-plugin-jest": "^29.0.1",
     "globals": "16.3.0",
     "jest": "30.0.4"
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.m?js$": "babel-jest"
-    },
-    "testMatch": [
-      "**/__tests__/**/*.?(m)js",
-      "**/?(*.)+(spec|test).?(m)js"
-    ],
-    "transformIgnorePatterns": [
-      "/node_modules/(?!ky|p-queue|serialize-error|ansi-styles)/"
-    ]
   }
 }

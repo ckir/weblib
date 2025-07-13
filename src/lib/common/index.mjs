@@ -5,3 +5,11 @@ import * as Retrieve from './Retrieve/index.mjs'
 import * as Utils from './Utils/index.mjs';
 
 export { Configs, Loggers, Markets, Retrieve, Utils };
+export default {
+    Configs,
+    Loggers,
+    Markets,
+    Retrieve,
+    Utils
+}
+

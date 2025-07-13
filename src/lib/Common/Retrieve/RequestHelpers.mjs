@@ -1,7 +1,6 @@
-import LoggerDummy from '../../Logger/LoggerDummy.mjs';
-
-if (typeof global.logger === 'undefined') {
-    global.logger = new LoggerDummy();
+if (global.logger === undefined) {
+    const { default: Logger } = await import('../Loggers/LoggerDummy.mjs');
+    global.logger = new Logger();
 }
 
 export default class RequestSerializer {

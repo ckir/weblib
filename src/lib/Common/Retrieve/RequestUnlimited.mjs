@@ -4,14 +4,13 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const deepmerge = require('deepmerge');
 
+import RequestResponseSerialize from './RequestResponseSerialize.mjs';
 
-
-import Response from './Response.mjs';
-import LoggerDummy from '../Loggers/LoggerDummy.mjs';
-
-if (typeof global.logger === 'undefined') {
-    global.logger = new LoggerDummy();
+if (global.logger === undefined) {
+    const { default: Logger } = await import('../Loggers/LoggerDummy.mjs');
+    global.logger = new Logger();
 }
+
 
 /**
  * A static class to handle unlimited GET requests using the `ky` library.
@@ -66,13 +65,14 @@ export default class RequestUnlimited {
         try {
             const request = ky.create(kyOptions);
             const responseObject = await request(url);
-            const response = await Response.serialize(responseObject);
-            return response;
+            const response = await RequestResponseSerialize.serialize(responseObject);
+            return { status: 'success', value: response };
         } catch (error) {
             const serializedError = serializeError(error);
             global.logger.warn('RequestUnlimited: Error occurred during API request:', serializedError);
-            return serializedError;
-        }
+            return { status: 'error', reason: serializedError };
+        };
+
     } // endPoint
 
     /**
@@ -97,7 +97,7 @@ export default class RequestUnlimited {
             // This block is a safeguard. The `endPoint` method is designed to always resolve.
             // However, if it were to reject unexpectedly, we log it and return a serialized error.
             global.logger.error('RequestUnlimited: Unexpected rejection in RequestUnlimited.endPoint:', result.reason);
-            return serializeError(result.reason);
+            return { status: 'error', reason: serializeError(result.reason) };
         });
     } // endPoints
 
