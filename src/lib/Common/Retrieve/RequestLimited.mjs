@@ -59,6 +59,10 @@ class RequestLimited extends EventEmitter {
                 methods: ['get', 'post'],
                 backoffLimit: 3000
             },
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
             hooks: {
                 beforeError: [
                     error => {
@@ -67,6 +71,11 @@ class RequestLimited extends EventEmitter {
                             error.status = response.status;
                         }
                         return error;
+                    }
+                ],
+                beforeRetry: [
+                    (options, error, retryCount) => {
+                        console.log('Retrying Knack API GET call, retry count: ' + retryCount);
                     }
                 ]
             },
@@ -220,7 +229,7 @@ class RequestLimited extends EventEmitter {
             // 2. `this.hostnameOverrides[hostname]?.kyOptions` (hostname-specific overrides)
             // 3. `globalKyOptions` (global options for this `fetchAll` call)
             // 4. `request.kyOptions` (options specific to this individual request)
-            const finalKyOptions = deepmerge.all([ this.defaultKyOptions, this.hostnameOverrides[hostname]?.kyOptions || {}, globalKyOptions, request.kyOptions || {} ]);
+            const finalKyOptions = deepmerge.all([this.defaultKyOptions, this.hostnameOverrides[hostname]?.kyOptions || {}, globalKyOptions, request.kyOptions || {}]);
 
             // Add the fetch task to the queue for the respective hostname.
             // The task itself is an async function that performs the Ky fetch.

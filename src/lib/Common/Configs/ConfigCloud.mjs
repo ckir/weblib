@@ -117,7 +117,7 @@ export default class ConfigCloud {
         let encryptedText = null;
         let iv = null;
         try {
-            let response = await RequestUnlimited.endPoint(cloudConfigUrl);
+            let response = await RequestUnlimited.endPoint(cloudConfigUrl, { headers: { 'Accept': '*/*' } });
             if (response.status !== 'success') {
                 global.logger.fatal(`Failed to fetch cloud config: ${response.status} ${response.statusText}`);
                 throw new Error(`Failed to fetch cloud config: ${response.status} ${response.statusText}`);

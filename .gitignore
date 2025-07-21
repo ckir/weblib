@@ -136,3 +136,4 @@ dist
 .pnp.*
 
 .vscode
+cache.sqlite3

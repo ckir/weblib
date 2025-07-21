@@ -30,14 +30,16 @@
   "homepage": "https://github.com/ckir/weblib#readme",
   "dependencies": {
     "ansi-styles": "^6.2.1",
+    "better-sqlite3": "^12.2.0",
     "croner": "9.1.0",
-    "deepmerge": "^4.3.1",
     "grammy": "1.37.0",
-    "ky": "1.8.1",
+    "keyv": "5.4.0",
+    "ky": "1.8.2",
     "luxon": "3.7.1",
     "p-queue": "8.1.0",
     "safe-stringify": "1.2.0",
-    "serialize-error": "12.0.0"
+    "serialize-error": "12.0.0",
+    "ts-deepmerge": "^7.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",

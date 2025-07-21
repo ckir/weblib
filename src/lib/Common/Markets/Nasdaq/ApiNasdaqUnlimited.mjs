@@ -58,7 +58,7 @@ export default class ApiNasdaqUnlimited {
             return false;
         }
 
-        if (response.value.body.status.rCode !== 200) {
+        if (response.value?.body?.status?.rCode !== 200) {
             return false;
         }
 
@@ -75,12 +75,14 @@ export default class ApiNasdaqUnlimited {
         return messages.join('::')
     } // apiErrorToString
 
-    static async endPoint(url, retry = null) {
+    static async endPoint(url, kyOptions = {}) {
 
-        const response = await RequestUnlimited.endPoint(url, { headers: getHeaders(url) }, retry);
+        kyOptions.headers = getHeaders(url);
+        const response = await RequestUnlimited.endPoint(url, kyOptions);
         if (!this.isResponseOk(response)) {
-            global.logger.error(`Request to ${url} failed with status: ${response.status}`);
-            return { status: 'error', reason: this.apiErrorToString(response.value.body.status) };
+            global.logger.warn(`Request to ${url} failed with status: ${response.status}`);
+            const reason = (response.value?.body?.status) ? this.apiErrorToString(response.value.body.status) : JSON.stringify(response.value);
+            return { status: 'error', reason: reason };
         } else {
             return { status: 'success', value: response.value.body.data };
         }

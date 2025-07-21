@@ -1,8 +1,10 @@
+import { inspect } from 'node:util';
 import ky from 'ky';
 import { serializeError } from 'serialize-error';
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const deepmerge = require('deepmerge');
+// import { createRequire } from 'module';
+// const require = createRequire(import.meta.url);
+// const deepmerge = require('deepmerge');
+import { merge } from "ts-deepmerge";
 
 import RequestResponseSerialize from './RequestResponseSerialize.mjs';
 
@@ -22,14 +24,19 @@ export default class RequestUnlimited {
 
     /**
      * Default configuration for ky requests, including retry logic and hooks.
-     * @type {{retry: {limit: number, methods: string[], backoffLimit: number}, hooks: {beforeError: Function[]}}}
+     * @type {{retry: {limit: number, methods: string[], backoffLimit: number}, hooks: {beforeError: Function[], beforeRetry: Function[]}, headers: {string: string}}}
      */
     static defaults = {
         retry: {
-            timeout: 10000, // 10 seconds
-            limit: 2,
+            timeout: 50000, // 50 seconds
+            limit: 5, // Retry up to 5 times
             methods: ['get', 'post'],
             backoffLimit: 3000
+        },
+        method: 'get', // Default method is GET
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
         },
         hooks: {
             beforeError: [
@@ -41,9 +48,33 @@ export default class RequestUnlimited {
 
                     return error;
                 }
+            ],
+            beforeRetry: [
+                (options, error, retryCount) => {
+                    global.logger.silly('Retrying API call, retry count: ' + retryCount);
+                }
             ]
         },
     }
+
+    /**
+ * Converts all top-level keys of an object to lowercase.
+ * This function creates a new object and does not modify the original.
+ *
+ * @param {object} obj The input object whose keys need to be lowercased.
+ * @returns {object} A new object with all top-level keys converted to lowercase.
+ */
+    static toLowercaseKeys(obj) {
+        const newObj = {};
+        for (const key in obj) {
+            // Ensure it's an own property, not inherited from the prototype chain
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                newObj[key.toLowerCase()] = obj[key];
+            }
+        }
+        return newObj;
+    } // toLowercaseKeys
+
 
     /**
      * Makes an HTTP request to a single URL.
@@ -60,7 +91,13 @@ export default class RequestUnlimited {
      * @returns {Promise<Object>} A promise that resolves to the serialized response object or a serialized error object.
      */
     static async endPoint(url, options = {}) {
-        const kyOptions = deepmerge(this.defaults, options);
+        this.defaults.headers = this.toLowercaseKeys(this.defaults.headers);
+        if (options.headers) {
+            options.headers = this.toLowercaseKeys(options.headers);
+        }
+        const kyOptions = merge.withOptions({ mergeArrays: false }, this.defaults, options);
+        // console.log(url)
+        // console.log(inspect(kyOptions, { depth: null, colors: true }));
 
         try {
             const request = ky.create(kyOptions);
@@ -69,6 +106,9 @@ export default class RequestUnlimited {
             return { status: 'success', value: response };
         } catch (error) {
             const serializedError = serializeError(error);
+            console.log(inspect(kyOptions, { depth: null, colors: true }));
+            console.log(inspect(this.defaults, { depth: null, colors: true }));
+            console.log(inspect(options, { depth: null, colors: true }));
             global.logger.warn('RequestUnlimited: Error occurred during API request:', serializedError);
             return { status: 'error', reason: serializedError };
         };
