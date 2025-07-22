@@ -27,8 +27,8 @@ export default class RequestUnlimited {
      * @type {{retry: {limit: number, methods: string[], backoffLimit: number}, hooks: {beforeError: Function[], beforeRetry: Function[]}, headers: {string: string}}}
      */
     static defaults = {
+        timeout: 50000, // 50 seconds
         retry: {
-            timeout: 50000, // 50 seconds
             limit: 5, // Retry up to 5 times
             methods: ['get', 'post'],
             backoffLimit: 3000
@@ -39,16 +39,6 @@ export default class RequestUnlimited {
             'Accept': 'application/json',
         },
         hooks: {
-            beforeError: [
-                error => {
-                    const { response } = error;
-                    if (response && response.body) {
-                        error.status = response.status;
-                    }
-
-                    return error;
-                }
-            ],
             beforeRetry: [
                 (options, error, retryCount) => {
                     global.logger.silly('Retrying API call, retry count: ' + retryCount);

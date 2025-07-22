@@ -5,9 +5,7 @@ import ky from 'ky';
 import PQueue from 'p-queue';
 import { serializeError } from 'serialize-error'; // Import serialize-error
 
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const deepmerge = require('deepmerge');
+import { merge } from "ts-deepmerge";
 
 import RequestResponseSerialize from './RequestResponseSerialize.mjs';
 
@@ -52,9 +50,9 @@ let currentKyInstance = ky;
 class RequestLimited extends EventEmitter {
 
     defaults = {
-        ky: {
+        kyOptions: {
+            timeout: 10000, // 10 seconds
             retry: {
-                timeout: 10000, // 10 seconds
                 limit: 2,
                 methods: ['get', 'post'],
                 backoffLimit: 3000
@@ -78,28 +76,30 @@ class RequestLimited extends EventEmitter {
                         console.log('Retrying Knack API GET call, retry count: ' + retryCount);
                     }
                 ]
-            },
-        }
+            }
+        },
+        queueOptions: {
+            concurrency: 5, // A reasonable default concurrency limit
+        },
+        hostnameOverrides: {}
     }
 
     /**
      * Creates an instance of RequestLimited.
-     * @param {ConstructorOptions} [options={}] - Options to configure default settings and hostname-specific overrides.
+     * @param {ConstructorOptions} [kyOptions={}] - Options to configure default settings and hostname-specific overrides.
      */
-    constructor(options = {}) {
+    constructor(options = { kyOptions: {}, queueOptions: {}, hostnameOverrides: {} }) {
         super();
 
         // Default global Ky options
-        this.defaultKyOptions = deepmerge(this.defaults.ky, options.kyDefaults || {});
+        this.defaultKyOptions = merge.withOptions({ mergeArrays: false }, this.defaults.kyOptions, options.kyOptions);
+        // this.defaultKyOptions = merge(this.defaults.ky, kyOptions.kyDefaults || {});
 
         // Default global P-Queue options. Concurrency is key here.
-        this.defaultQueueOptions = {
-            concurrency: 5, // A reasonable default concurrency limit
-            ...options.queueDefaults
-        };
+        this.defaultQueueOptions =  merge.withOptions({ mergeArrays: false }, this.defaults.queueOptions, options.queueOptions);
 
         // Per-hostname overrides for both Ky and P-Queue options
-        this.hostnameOverrides = options.hostnameOverrides || {};
+        this.hostnameOverrides = merge.withOptions({ mergeArrays: false }, this.defaults.hostnameOverrides, options.hostnameOverrides);
 
         // Bind methods to the instance to ensure `this` context is correct
         this.fetchAll = this.fetchAll.bind(this);
@@ -229,7 +229,7 @@ class RequestLimited extends EventEmitter {
             // 2. `this.hostnameOverrides[hostname]?.kyOptions` (hostname-specific overrides)
             // 3. `globalKyOptions` (global options for this `fetchAll` call)
             // 4. `request.kyOptions` (options specific to this individual request)
-            const finalKyOptions = deepmerge.all([this.defaultKyOptions, this.hostnameOverrides[hostname]?.kyOptions || {}, globalKyOptions, request.kyOptions || {}]);
+            const finalKyOptions = merge.withOptions({ mergeArrays: false }, this.defaultKyOptions, this.hostnameOverrides[hostname]?.kyOptions || {}, globalKyOptions, request.kyOptions || {});
 
             // Add the fetch task to the queue for the respective hostname.
             // The task itself is an async function that performs the Ky fetch.
