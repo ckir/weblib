@@ -72,7 +72,7 @@ export default class SystemUtils {
 	 * @returns {Promise<string>}
 	 * 
 	 */
-	async getProjectRootFolder() {
+	static async getProjectRootFolder() {
 
 		const path = await import('node:path')
 		const url = await import('node:url')

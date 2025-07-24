@@ -51,9 +51,9 @@ class RequestLimited extends EventEmitter {
 
     defaults = {
         kyOptions: {
-            timeout: 10000, // 10 seconds
+            timeout: 50000, // 50 seconds
             retry: {
-                limit: 2,
+                limit: 5,
                 methods: ['get', 'post'],
                 backoffLimit: 3000
             },
@@ -62,20 +62,13 @@ class RequestLimited extends EventEmitter {
                 'Accept': 'application/json',
             },
             hooks: {
-                beforeError: [
-                    error => {
-                        const { response } = error;
-                        if (response && response.body) {
-                            error.status = response.status;
+                hooks: {
+                    beforeRetry: [
+                        (options, error, retryCount) => {
+                            global.logger.silly('Retrying API call, retry count: ' + retryCount);
                         }
-                        return error;
-                    }
-                ],
-                beforeRetry: [
-                    (options, error, retryCount) => {
-                        console.log('Retrying Knack API GET call, retry count: ' + retryCount);
-                    }
-                ]
+                    ]
+                },
             }
         },
         queueOptions: {
@@ -96,7 +89,7 @@ class RequestLimited extends EventEmitter {
         // this.defaultKyOptions = merge(this.defaults.ky, kyOptions.kyDefaults || {});
 
         // Default global P-Queue options. Concurrency is key here.
-        this.defaultQueueOptions =  merge.withOptions({ mergeArrays: false }, this.defaults.queueOptions, options.queueOptions);
+        this.defaultQueueOptions = merge.withOptions({ mergeArrays: false }, this.defaults.queueOptions, options.queueOptions);
 
         // Per-hostname overrides for both Ky and P-Queue options
         this.hostnameOverrides = merge.withOptions({ mergeArrays: false }, this.defaults.hostnameOverrides, options.hostnameOverrides);
