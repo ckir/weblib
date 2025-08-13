@@ -94,6 +94,13 @@ export default class ConnectRedis {
     return this.#servers[server_id].subClient;
   } // getSub
 
+  static getServer(server_id = 0) {
+    if (server_id >= this.#servers.length) {
+      return null;
+    }
+    return this.#servers[server_id];
+  } // getServer
+
   static async getInfo(server_id = 0) {
 
     if (server_id >= this.#servers.length) {
@@ -118,12 +125,27 @@ export default class ConnectRedis {
 
     return {
       dbName: server.dbName,
-      dbHost:  new URL(server.dbUrl).host,
+      dbHost: new URL(server.dbUrl).host,
       dbInfo: infoString || null,
       redisVersion: redisVersion,
     };
 
   } // getInfo
+
+  static async close(server_id = 0) {
+    if (server_id >= this.#servers.length) {
+      return null;
+    }
+    const server = this.#servers[server_id];
+    if (server.pubClient) {
+      await server.pubClient.quit();
+      server.pubClient = null;
+    }
+    if (server.subClient) {
+      await server.subClient.quit();
+      server.subClient = null;
+    }
+  } // close
 
 } // ConnectRedis
 

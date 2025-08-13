@@ -10,9 +10,12 @@ const config = {
   // --experimental-vm-modules flag in the test script.
   transform: {},
 
+  // A list of paths to modules that run some code to configure or set up
+  // the testing framework before each test file in the suite is executed.
+  setupFiles: ['./test-setup.mjs'],
+
   // The test environment that will be used for testing.
   testEnvironment: 'node',
 };
 
 export default config;
-

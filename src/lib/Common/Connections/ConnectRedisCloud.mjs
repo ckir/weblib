@@ -76,7 +76,7 @@ export default class ConnectRedisCloud {
     }
   }
 
-  static get localRedisServersCount() {
+  static get cloudRedisServersCount() {
     return this.#servers.length;
   }
 
@@ -93,6 +93,13 @@ export default class ConnectRedisCloud {
     }
     return this.#servers[server_id].subClient;
   } // getSub
+
+  static getServer(server_id = 0) {
+    if (server_id >= this.#servers.length) {
+      return null;
+    }
+    return this.#servers[server_id];
+  } // getServer  
 
   static async getInfo(server_id = 0) {
 
@@ -125,7 +132,22 @@ export default class ConnectRedisCloud {
 
   } // getInfo
 
-} // ConnectRedis
+  static async close(server_id = 0) {
+    if (server_id >= this.#servers.length) {
+      return null;
+    }
+    const server = this.#servers[server_id];
+    if (server.pubClient) {
+      await server.pubClient.quit();
+      server.pubClient = null;
+    }
+    if (server.subClient) {
+      await server.subClient.quit();
+      server.subClient = null;
+    }
+  } // close  
+
+} // ConnectRedisCloud
 
 
 ConnectRedisCloud.initialize({ config: global.configData, logger: global.logger });
