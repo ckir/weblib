@@ -150,7 +150,7 @@ export default class ConnectRedis {
 } // ConnectRedis
 
 
-ConnectRedis.initialize({ config: global.configData, logger: global.logger });
+// ConnectRedis.initialize({ config: global.configData, logger: global.logger });
 
 // const pubClient = ConnectRedis.getPub();
 // const subClient = ConnectRedis.getSub();
