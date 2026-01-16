@@ -32,7 +32,7 @@
     "ansi-styles": "6.2.3",
     "better-sqlite3": "12.6.0",
     "croner": "9.1.0",
-    "grammy": "1.39.2",
+    "grammy": "1.39.3",
     "ioredis": "5.9.2",
     "keyv": "5.5.5",
     "ky": "1.14.2",
