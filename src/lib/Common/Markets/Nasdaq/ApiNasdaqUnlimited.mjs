@@ -1,5 +1,5 @@
 if (global.logger === undefined) {
-    const { default: Logger } = await import('../Loggers/LoggerDummy.mjs');
+    const { default: Logger } = await import('../../Loggers/LoggerDummy.mjs');
     global.logger = new Logger();
 }
 

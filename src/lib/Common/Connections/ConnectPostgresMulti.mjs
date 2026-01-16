@@ -1,4 +1,4 @@
-import { URL } from "url";
+import { URL } from "node:url";
 import { Pool, types } from 'pg';
 
 const DATE_OID = 1082;

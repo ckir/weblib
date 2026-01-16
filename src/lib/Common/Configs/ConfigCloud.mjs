@@ -105,7 +105,7 @@ export default class ConfigCloud {
     static async getCloudConfig(cloudConfigUrl = null, passphrase = null) {
 
         if (this.cloudConfig) return this.cloudConfig;
-
+console.log("Fetching cloud config...");
         cloudConfigUrl = cloudConfigUrl || process.env.WEBLIB_CLOUD_CONFIG_URL || null;
         passphrase = passphrase || process.env.WEBLIB_AES_PASSWORD || null;
         if (!cloudConfigUrl) {

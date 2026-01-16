@@ -1,5 +1,5 @@
-import os from 'os';
-import process from 'process';
+import os from 'node:os';
+import process from 'node:process';
 
 /**
  * A class to gather and encapsulate system and process information.

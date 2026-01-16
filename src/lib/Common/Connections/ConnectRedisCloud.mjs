@@ -1,4 +1,4 @@
-import { URL } from 'url';
+import { URL } from 'node:url';
 import { Redis } from "ioredis";
 import { serializeError } from 'serialize-error';
 

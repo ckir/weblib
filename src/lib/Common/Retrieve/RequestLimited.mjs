@@ -1,5 +1,5 @@
-import { URL } from 'url'; // Node.js built-in module
-import EventEmitter from 'events'; // Node.js built-in module
+import { URL } from 'node:url'; // Node.js built-in module
+import EventEmitter from 'node:events'; // Node.js built-in module
 
 import ky from 'ky';
 import PQueue from 'p-queue';
