@@ -22,13 +22,13 @@ const findHostKey = (url) => {
   return pgHost;
 }
 
-const logger = global.logger;
+const logger = globalThis.logger;
 const localPools = new Map();
 const cloudPools = new Map();
 const postgres_options = { max: 10, idleTimeoutMillis: 30000, connectionTimeoutMillis: 2000 };
 
 if (localPools.size === 0) {
-  for (const postgres_url of global.configData.config.db.postgres.local) {
+  for (const postgres_url of globalThis.configData.config.db.postgres.local) {
     let pool = null;
     if (typeof postgres_url === 'string' || postgres_url instanceof String) {
       pool = new Pool({
@@ -52,7 +52,7 @@ if (localPools.size === 0) {
 }
 
 if (cloudPools.size === 0) {
-  for (const postgres_url of global.configData.config.db.postgres.cloud) {
+  for (const postgres_url of globalThis.configData.config.db.postgres.cloud) {
     let pool = null;
     if (typeof postgres_url === 'string' || postgres_url instanceof String) {
       pool = new Pool({

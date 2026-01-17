@@ -139,13 +139,13 @@ export default class DateTimeUtils {
     static async exitAtSpecifiedTime(program, cronString = "@daily", exitTimezone = 'America/New_York') {
 
         const job = new Cron(cronString, { maxRuns: 1, timezone: exitTimezone }, () => {
-            global.logger.info(`${program}: Exiting at specified time ...`)
+            globalThis.logger.info(`${program}: Exiting at specified time ...`)
             process.exit(0)
         })
         const exitAt = job.nextRun()
         const diff = DateTime.fromJSDate(exitAt).diffNow().toFormat('hh:mm:ss')
 
-        global.logger.info(`${program}: Restarting in: ${diff}`)
+        globalThis.logger.info(`${program}: Restarting in: ${diff}`)
 
     } // exitAtSpecifiedTime
 
@@ -191,7 +191,7 @@ export default class DateTimeUtils {
         }
         const utcDateTime = dateTime.setZone('utc')
         const newYorkDateTime = dateTime.setZone('America/New_York')
-        const localDateTime = dateTime.setZone(global.localtimezone || 'Europe/Athens')
+        const localDateTime = dateTime.setZone(globalThis.localtimezone || 'Europe/Athens')
 
         const zones = {
             utc: { sql: utcDateTime.toSQL({ includeZone: true }), str: utcDateTime.toFormat("yyyy/MM/dd HH:mm:ss") },

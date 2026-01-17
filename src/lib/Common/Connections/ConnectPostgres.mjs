@@ -16,7 +16,7 @@ export default class ConnectPostgres {
 
   static getPool() {
     if (this.pool) return this.pool;
-    const connectionString = global.configData.config.db.postgres.local[0];
+    const connectionString = globalThis.configData.config.db.postgres.local[0];
     this.pool = new Pool({
       connectionString,
     });

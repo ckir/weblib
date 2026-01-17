@@ -1,6 +1,6 @@
-if (global.logger === undefined) {
+if (globalThis.logger === undefined) {
     const { default: Logger } = await import('../../Loggers/LoggerDummy.mjs');
-    global.logger = new Logger();
+    globalThis.logger = new Logger();
 }
 
 import RequestUnlimited from '../../Retrieve/RequestUnlimited.mjs';
@@ -80,7 +80,7 @@ export default class ApiNasdaqUnlimited {
         kyOptions.headers = getHeaders(url);
         const response = await RequestUnlimited.endPoint(url, kyOptions);
         if (!this.isResponseOk(response)) {
-            global.logger.warn(`Request to ${url} failed with status: ${response.status}`);
+            globalThis.logger.warn(`Request to ${url} failed with status: ${response.status}`);
             const reason = (response.value?.body?.status) ? this.apiErrorToString(response.value.body.status) : JSON.stringify(response.value);
             return { status: 'error', reason: reason };
         } else {

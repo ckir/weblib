@@ -2,7 +2,7 @@ import RequestLimited from './RequestLimited.mjs';
 import { jest } from '@jest/globals';
 
 // Mock the global logger to prevent console output during tests and allow spying
-global.logger = {
+globalThis.logger = {
     warn: jest.fn(),
     error: jest.fn(),
 };

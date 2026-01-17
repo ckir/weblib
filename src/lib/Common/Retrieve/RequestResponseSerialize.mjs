@@ -37,12 +37,12 @@ export default class RequestResponseSerialize {
                 // body = Buffer.from(buffer).toString('base64'); // Example for Node.js Buffer
             }
         } catch (error) {
-           global.logger.warn('Error parsing response body during serialization:', error);
+           globalThis.logger.warn('Error parsing response body during serialization:', error);
             // Try to get text if JSON parsing failed or if it was an unexpected error
             try {
                 body = await clonedResponse.text(); // Attempt to read as text as a last resort
             } catch (textError) {
-                global.logger.warn('Error reading response body as text during serialization fallback:', textError);
+                globalThis.logger.warn('Error reading response body as text during serialization fallback:', textError);
                 body = '[Error reading or parsing body]';
             }
         }

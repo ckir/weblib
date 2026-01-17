@@ -2,14 +2,9 @@ import { URL } from 'node:url';
 import { Redis } from "ioredis";
 import { serializeError } from 'serialize-error';
 
-if (global.logger === undefined) {
+if (globalThis.logger === undefined) {
   const { default: Logger } = await import('../Loggers/LoggerDummy.mjs');
-  global.logger = new Logger();
-}
-
-if (!global.configData) {
-  const { default: ConfigCloud } = await import('../Configs/ConfigCloud.mjs');
-  global.configData = await ConfigCloud.getCloudConfig();
+  globalThis.logger = new Logger();
 }
 
 const redis_options = {
@@ -57,7 +52,13 @@ export default class ConnectRedisCloud {
    * @param {object} options.config - The application configuration object.
    * @param {object} options.logger - The logger instance.
    */
-  static initialize({ config, logger }) {
+  static async initialize({ config, logger }) {
+    if (!config) {
+      if (!globalThis.cloudConfig) {
+        const { default: ConfigCloud } = await import('../Configs/ConfigCloud.mjs');
+        globalThis.cloudConfig = await ConfigCloud.getCloudConfig();
+      }
+    }
     this.#logger = logger;
     // Make a copy to avoid mutating the original config object
     this.#servers = [...config.commonAll.db.redis.cloud];
@@ -125,7 +126,7 @@ export default class ConnectRedisCloud {
 
     return {
       dbName: server.dbName,
-      dbHost:  new URL(server.dbUrl).host,
+      dbHost: new URL(server.dbUrl).host,
       dbInfo: infoString || null,
       redisVersion: redisVersion,
     };
@@ -150,7 +151,7 @@ export default class ConnectRedisCloud {
 } // ConnectRedisCloud
 
 
-// ConnectRedisCloud.initialize({ config: global.configData, logger: global.logger });
+// ConnectRedisCloud.initialize({ config: globalThis.configData, logger: globalThis.logger });
 
 // const pubClient = ConnectRedisCloud.getPub();
 // const subClient = ConnectRedisCloud.getSub();

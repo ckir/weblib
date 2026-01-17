@@ -8,9 +8,9 @@ import { merge } from "ts-deepmerge";
 
 import RequestResponseSerialize from './RequestResponseSerialize.mjs';
 
-if (global.logger === undefined) {
+if (globalThis.logger === undefined) {
     const { default: Logger } = await import('../Loggers/LoggerDummy.mjs');
-    global.logger = new Logger();
+    globalThis.logger = new Logger();
 }
 
 
@@ -51,7 +51,7 @@ export default class RequestUnlimited {
             ],
             beforeRetry: [
                 (options, error, retryCount) => {
-                    global.logger.silly('Retrying API call, retry count: ' + retryCount);
+                    globalThis.logger.silly('Retrying API call, retry count: ' + retryCount);
                 }
             ]
         },
@@ -109,7 +109,7 @@ export default class RequestUnlimited {
             console.log(inspect(kyOptions, { depth: null, colors: true }));
             console.log(inspect(this.defaults, { depth: null, colors: true }));
             console.log(inspect(options, { depth: null, colors: true }));
-            global.logger.warn('RequestUnlimited: Error occurred during API request:', serializedError);
+            globalThis.logger.warn('RequestUnlimited: Error occurred during API request:', serializedError);
             return { status: 'error', reason: serializedError };
         };
 
@@ -136,7 +136,7 @@ export default class RequestUnlimited {
 
             // This block is a safeguard. The `endPoint` method is designed to always resolve.
             // However, if it were to reject unexpectedly, we log it and return a serialized error.
-            global.logger.error('RequestUnlimited: Unexpected rejection in RequestUnlimited.endPoint:', result.reason);
+            globalThis.logger.error('RequestUnlimited: Unexpected rejection in RequestUnlimited.endPoint:', result.reason);
             return { status: 'error', reason: serializeError(result.reason) };
         });
     } // endPoints

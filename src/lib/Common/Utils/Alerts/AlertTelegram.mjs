@@ -6,7 +6,7 @@ export default class AlertTelegram {
     constructor(bot = process.env.WEBLIB_ALERTTELEGRAM_BOT, recipients = process.env.WEBLIB_ALERTTELEGRAM_RECIPIENTS.split(",").map(i => i.trim())) {
         this.className = this.constructor.name;
         this.bot = new Bot(bot);
-        this.logger = global.logger;
+        this.logger = globalThis.logger;
         this.recipients = recipients;
     } // constructor
 

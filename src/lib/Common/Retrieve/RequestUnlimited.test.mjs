@@ -13,9 +13,9 @@ describe('RequestUnlimited', () => {
     // Before each test, we'll set up a mock logger and clear all previous mocks
     beforeEach(() => {
         jest.clearAllMocks();
-        global.logger = new LoggerDummy();
-        global.logger.warn = jest.fn();
-        global.logger.error = jest.fn();
+        globalThis.logger = new LoggerDummy();
+        globalThis.logger.warn = jest.fn();
+        globalThis.logger.error = jest.fn();
     });
 
     describe('endPoint', () => {
@@ -84,7 +84,7 @@ describe('RequestUnlimited', () => {
             // Assert
             expect(mockKyInstance).toHaveBeenCalledWith(mockUrl, { method: 'get' });
             expect(serializeError).toHaveBeenCalledWith(mockError);
-            expect(global.logger.warn).toHaveBeenCalledWith('RequestUnlimited: Error occurred during API request:', mockError);
+            expect(globalThis.logger.warn).toHaveBeenCalledWith('RequestUnlimited: Error occurred during API request:', mockError);
             expect(result).toEqual(mockSerializedError);
         });
     });

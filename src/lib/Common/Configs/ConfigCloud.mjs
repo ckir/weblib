@@ -104,7 +104,7 @@ export default class ConfigCloud {
        */
     static async getCloudConfig(cloudConfigUrl = null, passphrase = null) {
 
-        if (this.cloudConfig) return this.cloudConfig;
+        if (globalThis.cloudConfig) return globalThis.cloudConfig;
 console.log("Fetching cloud config...");
         cloudConfigUrl = cloudConfigUrl || process.env.WEBLIB_CLOUD_CONFIG_URL || null;
         passphrase = passphrase || process.env.WEBLIB_AES_PASSWORD || null;
@@ -119,7 +119,7 @@ console.log("Fetching cloud config...");
         try {
             let response = await RequestUnlimited.endPoint(cloudConfigUrl, { headers: { 'Accept': '*/*' } });
             if (response.status !== 'success') {
-                global.logger.fatal(`Failed to fetch cloud config: ${response.status} ${response.statusText}`);
+                globalThis.logger.fatal(`Failed to fetch cloud config: ${response.status} ${response.statusText}`);
                 throw new Error(`Failed to fetch cloud config: ${response.status} ${response.statusText}`);
             }
             response = response.value.body;
@@ -127,7 +127,7 @@ console.log("Fetching cloud config...");
             iv = encrypteLines[0].trim();
             encryptedText = encrypteLines[1].trim();
         } catch (e) {
-            global.logger.fatal(`Failed after retries (single fetch): ${e.message}`);
+            globalThis.logger.fatal(`Failed after retries (single fetch): ${e.message}`);
             throw e;
         }
 
@@ -135,7 +135,7 @@ console.log("Fetching cloud config...");
         try {
             unencryptedText = decryptAes256Cbc(encryptedText, passphrase, iv, 'utf8');
         } catch (e) {
-            global.logger.fatal(`Failed to decrypt: ${e.message}`);
+            globalThis.logger.fatal(`Failed to decrypt: ${e.message}`);
             throw e
         }
 
@@ -143,11 +143,11 @@ console.log("Fetching cloud config...");
         try {
             configJson = JSON.parse(unencryptedText);
         } catch (e) {
-            global.logger.fatal(`Failed to convert to json: ${e.message}`);
+            globalThis.logger.fatal(`Failed to convert to json: ${e.message}`);
             throw e
         }
 
-        this.cloudConfig = configJson;
+        globalThis.cloudConfig = configJson;
         return configJson
 
     } // getCloudConfig

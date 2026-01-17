@@ -8,7 +8,6 @@ import DateTimeUtils from "../Utils/Misc/DateTimeUtils.mjs";
 const isWindows = process.platform === "win32";
 const isLinux = process.platform === "linux";
 
-
 export default class LoggerLocal {
 
     LoggerDefaults = {

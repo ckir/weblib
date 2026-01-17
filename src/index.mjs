@@ -11,11 +11,11 @@ export { luxon };
 import * as Common from './lib/Common/index.mjs';
 import * as Cloud from './lib/Cloud/index.mjs';
 
-global.WebLib = {};
-// if (!global.logger) {
-//     const { default: Logger } = await import('./lib/Common/Logger/LoggerDummy.mjs');
-//     global.logger = new Logger();
-// }
+globalThis.WebLib = {};
+if (!globalThis.logger) {
+    const { default: Logger } = await import('./lib/Common/Logger/LoggerDummy.mjs');
+    globalThis.logger = new Logger();
+}
 
 export const WebLib = {
     Common,

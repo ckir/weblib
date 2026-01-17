@@ -7,20 +7,20 @@ import { default as ConfigCloud } from '../Configs/ConfigCloud.mjs';
 import { default as Logger } from '../Loggers/LoggerDummy.mjs';
 
 // --- Setup ---
-// The connection modules rely on global.configData and global.logger.
+// The connection modules rely on globalThis.configData and globalThis.logger.
 // In a real application, this would be set up once at the entry point.
 async function setupGlobals() {
-  if (!global.logger) {
-    global.logger = new Logger();
-    global.logger.info('Logger initialized for test.');
+  if (!globalThis.logger) {
+    globalThis.logger = new Logger();
+    globalThis.logger.info('Logger initialized for test.');
   }
-  if (!global.configData) {
+  if (!globalThis.configData) {
     try {
-      global.logger.info('Fetching cloud configuration...');
-      global.configData = await ConfigCloud.getCloudConfig();
-      global.logger.info('Cloud configuration loaded.');
+      globalThis.logger.info('Fetching cloud configuration...');
+      globalThis.configData = await ConfigCloud.getCloudConfig();
+      globalThis.logger.info('Cloud configuration loaded.');
     } catch (error) {
-      global.logger.fatal(`Failed to load configuration. Cannot proceed with test. ${error.message}`);
+      globalThis.logger.fatal(`Failed to load configuration. Cannot proceed with test. ${error.message}`);
       process.exit(1);
     }
   }

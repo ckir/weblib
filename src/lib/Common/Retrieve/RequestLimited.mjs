@@ -9,9 +9,9 @@ import { merge } from "ts-deepmerge";
 
 import RequestResponseSerialize from './RequestResponseSerialize.mjs';
 
-if (global.logger === undefined) {
+if (globalThis.logger === undefined) {
     const { default: Logger } = await import('../Loggers/LoggerDummy.mjs');
-    global.logger = new Logger();
+    globalThis.logger = new Logger();
 }
 
 
@@ -65,7 +65,7 @@ class RequestLimited extends EventEmitter {
                 hooks: {
                     beforeRetry: [
                         (options, error, retryCount) => {
-                            global.logger.silly('Retrying API call, retry count: ' + retryCount);
+                            globalThis.logger.silly('Retrying API call, retry count: ' + retryCount);
                         }
                     ]
                 },
@@ -191,7 +191,7 @@ class RequestLimited extends EventEmitter {
             // Basic validation for the request object
             if (!request || typeof request.url !== 'string') {
                 const errorMessage = 'Invalid request: Each request must be an object with a "url" string property.';
-                global.logger.error(errorMessage, request);
+                globalThis.logger.error(errorMessage, request);
                 const error = new Error(errorMessage);
                 // Attach the URL to the error before serialization
                 error.url = request ? request.url : 'N/A'; // Add URL for better context
@@ -206,7 +206,7 @@ class RequestLimited extends EventEmitter {
                 parsedUrl = new URL(request.url);
             } catch (error) {
                 const errorMessage = `Invalid URL provided: "${request.url}".`;
-                global.logger.error(errorMessage, error);
+                globalThis.logger.error(errorMessage, error);
                 // Attach the URL to the error before serialization
                 error.url = request.url; // Add URL for better context
                 this.emit('request:error', { url: request.url, error: serializeError(error), message: errorMessage });
@@ -246,7 +246,7 @@ class RequestLimited extends EventEmitter {
                     error.url = request.url; // Add URL for better context
                     // Emit an event if the request encounters an error, serializing it
                     this.emit('request:error', { url: request.url, hostname, error: serializeError(error) });
-                    global.logger.error(`Error fetching ${request.url} (Hostname: ${hostname}):`, error.message);
+                    globalThis.logger.error(`Error fetching ${request.url} (Hostname: ${hostname}):`, error.message);
                     throw error; // Re-throw the error so Promise.allSettled catches it as a rejection
                 }
             });

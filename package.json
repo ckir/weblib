@@ -30,7 +30,7 @@
   "homepage": "https://github.com/ckir/weblib#readme",
   "dependencies": {
     "ansi-styles": "6.2.3",
-    "better-sqlite3": "12.6.0",
+    "better-sqlite3": "12.6.2",
     "croner": "9.1.0",
     "grammy": "1.39.3",
     "ioredis": "5.9.2",
@@ -40,7 +40,7 @@
     "p-queue": "9.1.0",
     "pg": "8.17.1",
     "safe-stringify": "1.2.0",
-    "serialize-error": "12.0.0",
+    "serialize-error": "13.0.0",
     "ts-deepmerge": "7.0.3"
   },
   "devDependencies": {

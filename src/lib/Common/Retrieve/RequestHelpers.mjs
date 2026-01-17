@@ -1,6 +1,6 @@
-if (global.logger === undefined) {
+if (globalThis.logger === undefined) {
     const { default: Logger } = await import('../Loggers/LoggerDummy.mjs');
-    global.logger = new Logger();
+    globalThis.logger = new Logger();
 }
 
 export default class RequestSerializer {
@@ -42,7 +42,7 @@ export default class RequestSerializer {
             // If body has already been used, we cannot read it again.
             // In a real application, you might want to clone the request before using its body
             // or handle this scenario based on your application's logic.
-            global.logger.warn('Request body has already been used. Body will not be serialized.');
+            globalThis.logger.warn('Request body has already been used. Body will not be serialized.');
         } else if (request.method !== 'GET' && request.method !== 'HEAD') {
             try {
                 // Attempt to read body as text. Adjust based on expected content type (e.g., blob, arrayBuffer, formData)
@@ -51,7 +51,7 @@ export default class RequestSerializer {
                 // You might also want to store content-type to help deserialize
                 serializedRequest.bodyType = 'text'; // Or 'json', 'blob', 'arrayBuffer', 'formData'
             } catch (error) {
-                global.logger.error('Error reading request body:', error);
+                globalThis.logger.error('Error reading request body:', error);
                 serializedRequest.body = null;
             }
         }

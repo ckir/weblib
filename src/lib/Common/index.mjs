@@ -15,3 +15,9 @@ export {
     Retrieve,
     Utils
 }
+
+// Source - https://stackoverflow.com/a
+// Posted by Dan Dascalescu, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-01-17, License - CC BY-SA 4.0
+
+await new Promise(r => setTimeout(r, 3000));

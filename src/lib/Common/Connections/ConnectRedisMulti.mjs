@@ -2,9 +2,9 @@
 import ConnectRedis from './ConnectRedis.mjs';
 import ConnectRedisCloud from './ConnectRedisCloud.mjs';
 
-if (global.logger === undefined) {
+if (globalThis.logger === undefined) {
   const { default: Logger } = await import('../Loggers/LoggerDummy.mjs');
-  global.logger = new Logger();
+  globalThis.logger = new Logger();
 }
 
 export default class ConnectRedisMulti {
