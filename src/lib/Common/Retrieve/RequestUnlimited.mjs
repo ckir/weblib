@@ -1,9 +1,6 @@
-import { inspect } from 'node:util';
-import ky from 'ky';
+// import { inspect } from 'node:util';
+import ky, { HTTPError } from 'ky';
 import { serializeError } from 'serialize-error';
-// import { createRequire } from 'module';
-// const require = createRequire(import.meta.url);
-// const deepmerge = require('deepmerge');
 import { merge } from "ts-deepmerge";
 
 import RequestResponseSerialize from './RequestResponseSerialize.mjs';
@@ -28,10 +25,30 @@ export default class RequestUnlimited {
      */
     static defaults = {
         timeout: 50000, // 50 seconds
+        throwHttpErrors: false,
         retry: {
             limit: 5, // Retry up to 5 times
             methods: ['get', 'post'],
-            backoffLimit: 3000
+            backoffLimit: 3000,
+            shouldRetry: ({ error, retryCount }) => {
+                // Retry on specific business logic errors from API
+                if (error instanceof HTTPError) {
+                    const status = error.response.status;
+
+                    // Retry on 429 (rate limit)
+                    if (status === 429 && retryCount <= 5) {
+                        return true;
+                    }
+
+                    // Don't retry on 4xx errors except rate limits
+                    if (status >= 400 && status < 500) {
+                        return false;
+                    }
+                }
+
+                // Use default retry logic for other errors
+                return undefined;
+            }
         },
         method: 'get', // Default method is GET
         headers: {
@@ -39,8 +56,20 @@ export default class RequestUnlimited {
             'Accept': 'application/json',
         },
         hooks: {
+            // beforeError: [
+            //     async error => {
+            //         const { response } = error;
+            //         if (response) {
+            //             const body = await response.json();
+            //             error.name = 'GitHubError';
+            //             error.message = `${body.message} (${response.status})`;
+            //         }
+
+            //         return error;
+            //     },
+            // ],
             beforeRetry: [
-                (options, error, retryCount) => {
+                async ({ request, options, error, retryCount }) => {
                     globalThis.logger.silly('Retrying API call, retry count: ' + retryCount);
                 }
             ]
@@ -90,16 +119,23 @@ export default class RequestUnlimited {
         // console.log(inspect(kyOptions, { depth: null, colors: true }));
 
         try {
+
             const request = ky.create(kyOptions);
             const responseObject = await request(url);
             const response = await RequestResponseSerialize.serialize(responseObject);
-            return { status: 'success', value: response };
+            if (!response.ok) {
+                globalThis.logger.warn(`${this.name}: HTTP error occurred during API request:`, response);
+                return { status: 'error', reason: response };
+            } else {
+                return { status: 'success', value: response };
+            }
+
         } catch (error) {
             const serializedError = serializeError(error);
-            console.log(inspect(kyOptions, { depth: null, colors: true }));
-            console.log(inspect(this.defaults, { depth: null, colors: true }));
-            console.log(inspect(options, { depth: null, colors: true }));
-            globalThis.logger.warn('RequestUnlimited: Error occurred during API request:', serializedError);
+            // console.log(inspect(kyOptions, { depth: null, colors: true }));
+            // console.log(inspect(this.defaults, { depth: null, colors: true }));
+            // console.log(inspect(options, { depth: null, colors: true }));
+            globalThis.logger.warn(`${this.name}: Error occurred during API request:`, serializedError);
             return { status: 'error', reason: serializedError };
         };
 
@@ -126,7 +162,7 @@ export default class RequestUnlimited {
 
             // This block is a safeguard. The `endPoint` method is designed to always resolve.
             // However, if it were to reject unexpectedly, we log it and return a serialized error.
-            globalThis.logger.error('RequestUnlimited: Unexpected rejection in RequestUnlimited.endPoint:', result.reason);
+            globalThis.logger.error(`${this.name}: Unexpected rejection in RequestUnlimited.endPoint:`, result.reason);
             return { status: 'error', reason: serializeError(result.reason) };
         });
     } // endPoints

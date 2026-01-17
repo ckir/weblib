@@ -79,14 +79,23 @@ export default class ApiNasdaqUnlimited {
 
         kyOptions.headers = getHeaders(url);
         const response = await RequestUnlimited.endPoint(url, kyOptions);
-        if (!this.isResponseOk(response)) {
-            globalThis.logger.warn(`Request to ${url} failed with status: ${response.status}`);
-            const reason = (response.value?.body?.status) ? this.apiErrorToString(response.value.body.status) : JSON.stringify(response.value);
-            return { status: 'error', reason: reason };
+        // HTTP or network error
+        if (response.status === 'error') {
+            // Log already done in RequestUnlimited
+            return { status: 'error', reason: response.reason };
         } else {
-            return { status: 'success', value: response.value.body.data };
+            // API error
+            if (!this.isResponseOk(response)) {
+                globalThis.logger.warn(`${this.name}: Request to ${url} failed with status: ${response.status}`);
+                const reason = (response.value?.body?.status) ? this.apiErrorToString(response.value.body.status) : JSON.stringify(response.value);
+                return { status: 'error', reason: reason };
+            } else {
+                const value = response.value.body.data;
+                let details = response.value;
+                delete details.body
+                return { status: 'success', value: value, details: details };
+            }
         }
-
     } // endPoint
 
 } // ApiNasdaqUnlimited
