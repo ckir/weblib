@@ -9,7 +9,7 @@ export const getEnvironment = () => {
   }
 
   // 2. Cloud Run Function (GCP)
-  if (globalThis.process?.env?.FUNCTION_TARGET || globalThis.process?.env?.FUNCTION_SIGNATURE_TYPE) {
+  if (globalThis.process?.env?.K_SERVICE || globalThis.process?.env?.FUNCTION_TARGET || globalThis.process?.env?.FUNCTION_SIGNATURE_TYPE) {
     return 'cloud-run-function';
   }
 
