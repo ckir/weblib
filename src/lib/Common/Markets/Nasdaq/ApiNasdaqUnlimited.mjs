@@ -87,7 +87,7 @@ export default class ApiNasdaqUnlimited {
             // API error
             if (!this.isResponseOk(response)) {
                 globalThis.logger.warn(`${this.name}: Request to ${url} failed with status: ${response.status}`);
-                const reason = (response.value?.body?.status) ? this.apiErrorToString(response.value.body.status) : JSON.stringify(response.value);
+                const reason = { message: (response.value?.body?.status) ? this.apiErrorToString(response.value.body.status) : JSON.stringify(response.value) };
                 return { status: 'error', reason: reason };
             } else {
                 const value = response.value.body.data;
@@ -100,6 +100,7 @@ export default class ApiNasdaqUnlimited {
 
 } // ApiNasdaqUnlimited
 
-// const res = await ApiNasdaqUnlimited.endPoint('https://api.nasdaq.com/api/market-info');
+// const res = await ApiNasdaqUnlimited.endPoint('https://api.nasdaq.com/api/market-inf');
+// const res = await ApiNasdaqUnlimited.endPoint("https://api.nasdaq.com/api/quote/ZZZZ/info?assetclass=stocks");
 // console.log(res.status, res);
 // let a = 5;
