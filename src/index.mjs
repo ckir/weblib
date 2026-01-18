@@ -28,4 +28,8 @@ export const WebLib = {
     }
 };
 
+export function init() {
+    console.log('WebLib initialized');
+}
+
 export default WebLib;
