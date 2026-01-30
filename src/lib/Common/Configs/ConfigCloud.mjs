@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { homedir } from 'node:os';
 import crypto from 'crypto';
 import RequestUnlimited from '../Retrieve/RequestUnlimited.mjs';
 
@@ -105,7 +108,7 @@ export default class ConfigCloud {
     static async getCloudConfig(cloudConfigUrl = null, passphrase = null) {
 
         if (globalThis.cloudConfig) return globalThis.cloudConfig;
-console.log("Fetching cloud config...");
+        globalThis.logger.silly('Fetching cloud config...');
         cloudConfigUrl = cloudConfigUrl || process.env.WEBLIB_CLOUD_CONFIG_URL || null;
         passphrase = passphrase || process.env.WEBLIB_AES_PASSWORD || null;
         if (!cloudConfigUrl) {
@@ -145,6 +148,18 @@ console.log("Fetching cloud config...");
         } catch (e) {
             globalThis.logger.fatal(`Failed to convert to json: ${e.message}`);
             throw e
+        }
+
+        const certDir = join(homedir(), '.letsencrypt');
+
+        try {
+            const fullchain = readFileSync(join(certDir, 'fullchain.pem'), 'utf8');
+            const privkey = readFileSync(join(certDir, 'privkey.pem'), 'utf8');
+            configJson.commonAll.letsencrypt.fullchain = fullchain;
+            configJson.commonAll.letsencrypt.privkey = privkey;
+            globalThis.logger.silly('Certificates loaded successfully.');
+        } catch ({ message }) {
+            globalThis.logger.warn(`Error reading certificates: ${message}`);
         }
 
         globalThis.cloudConfig = configJson;

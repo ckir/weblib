@@ -5,10 +5,9 @@ import safeStringify from 'safe-stringify';
 import * as luxon from 'luxon';
 
 import ConfigCloud from './lib/Common/Configs/ConfigCloud.mjs';
-// import * as Common from './lib/Common/index.mjs';
-// import * as Cloud from './lib/Cloud/index.mjs';
 
 globalThis.WebLib = {};
+
 if (!globalThis.logger) {
     const { default: Logger } = await import('./lib/Common/Loggers/LoggerDummy.mjs');
     globalThis.logger = new Logger();
@@ -17,7 +16,7 @@ if (!globalThis.logger) {
 
 if (!globalThis.cloudConfig) {
     globalThis.cloudConfig = await ConfigCloud.getCloudConfig();
-    globalThis.logger.debug('Cloud config initialized.');
+    globalThis.logger.info('WebLib: Cloud config loaded.');
 }
 
 const Common = await import('./lib/Common/index.mjs');
