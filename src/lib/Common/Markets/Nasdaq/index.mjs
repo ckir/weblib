@@ -1,2 +1,4 @@
 import ApiNasdaqUnlimited from "./ApiNasdaqUnlimited.mjs";
-export { ApiNasdaqUnlimited };
+import * as DataFeeds from "./DataFeeds/index.mjs";
+
+export { ApiNasdaqUnlimited, DataFeeds };
