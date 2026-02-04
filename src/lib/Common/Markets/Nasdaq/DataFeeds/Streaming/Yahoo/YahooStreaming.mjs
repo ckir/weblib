@@ -211,20 +211,61 @@ export default class YahooStreaming extends EventEmitter {
         this._setupHeartbeatMonitor();
 
         this.logger.info(`${this.constructor.name}: Started`);
-        // process.on('SIGTERM', () => this._gracefulShutdown('SIGTERM'));
-        // process.on('SIGINT', () => this._gracefulShutdown('SIGINT'));		
-    }
+        this._registerSignalHandlers();		
+    } // constructor
 
-    _gracefulShutdown = (signal) => {
-        this.logger.debug(`${this.className}: Received ${signal}, closing WebSocket connection`);
+    /**
+     * Gracefully shuts down the stream by terminating the WebSocket
+     * and preventing reconnect attempts.
+     */
+    _gracefulShutdown() {
+        this.logger.info(`${this.constructor.name}: Graceful shutdown requested`);
 
-        if (this.ws) {
-            this.ws.terminate(() => {
-                this.logger.debug(`${this.className}: WebSocket connection closed`);
-            })
+        // Prevent reconnect logic from triggering
+        this.manualClose = true;
+
+        // Stop heartbeat timer if running
+        if (this.heartbeatTimer) {
+            clearInterval(this.heartbeatTimer);
+            this.heartbeatTimer = null;
         }
-    } // gracefulShutdown
-	
+
+        // Terminate WebSocket immediately
+        if (this.ws) {
+            try {
+                this.ws.terminate();
+                this.logger.info(`${this.constructor.name}: WebSocket terminated`);
+            } catch (err) {
+                this.logger.error(`${this.constructor.name}: Error during termination`, err);
+            }
+        }
+
+        this.emit('shutdown');
+    } // _gracefulShutdown
+
+    /**
+ * Registers OS signal handlers for graceful shutdown.
+ *
+ * Ensures handlers are only registered once globally.
+ *
+ * @private
+ */
+    _registerSignalHandlers() {
+        if (YahooStreaming._signalsRegistered) return;
+        YahooStreaming._signalsRegistered = true;
+
+        const shutdown = () => {
+            this.logger.info(`${this.constructor.name}: Received shutdown signal`);
+            this._gracefulShutdown();
+        };
+
+        process.on('SIGINT', shutdown);
+        process.on('SIGTERM', shutdown);
+        process.on('SIGQUIT', shutdown);
+
+        this.logger.info(`${this.constructor.name}: Signal handlers registered`);
+    } // _registerSignalHandlers
+
     /**
      * Connects to the WebSocket endpoint and sets up handlers.
      *
